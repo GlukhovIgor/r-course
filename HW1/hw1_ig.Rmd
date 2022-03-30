@@ -1,0 +1,44 @@
+---
+title: "hw1 igor glukhov"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+
+```{r}
+x_lower <- -pi * 0.5
+x_upper <- pi * 0.5
+
+y_min <- -pi
+y_max <- 1
+
+total_square <- (y_max - y_min) * (x_upper - x_lower) 
+
+N = 1000
+
+rand_dots_x <- runif(N, x_lower, x_upper)
+rand_dots_y <- runif(N, y_min, y_max)
+
+grid <- expand.grid(x=rand_dots_x, y=rand_dots_y)
+
+
+ upper_func <- function(x, y){
+   return(y > 2 * abs(x) - pi)
+ }
+ 
+ lower_func <- function(x, y){
+   return(y < abs(sin(2*x)))
+ }
+ 
+ total_func <- function(x, y){
+   return(upper_func(x, y) & lower_func(x, y))
+ }
+ 
+ 
+grid$is_inside <- apply(grid[,c('x','y')], 1, function(dot) total_func(dot['x'],dot['y']))
+
+cat("Square under the figure is:", mean(grid$is_inside) * total_square)
+```
+
+
