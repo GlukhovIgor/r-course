@@ -1,0 +1,149 @@
+---
+title: "HW2_Igor_Glukhov"
+author: "Igor Glukhov"
+date: '2022-04-15'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Black Jack
+
+
+```{r cars}
+deck_descr <- read.csv("deck.csv")
+tail(deck_descr, 5)
+```
+
+## Function implementation
+
+```{r}
+shuffle_deck <- function(){
+  return(c(rep(seq(1, 52), 4))) 
+}
+
+calc_chance <- function(dealer_hand, player_hand, deck, deck_descr){
+  player_cards = deck_descr[player_hand, ]
+  dealer_cards = deck_descr[dealer_hand, ]
+  deck_cards = deck_descr[deck, ]
+  
+  cur_player_sum <- sum(player_cards$value) 
+  cur_dealer_sum <- sum(dealer_cards$value)
+  
+  if(cur_player_sum > 21){
+    return("0%")
+  } 
+  else if(cur_player_sum > cur_dealer_sum){
+    return("100%")
+  } 
+  else{
+    max_card_in_deck <- max(deck_descr[deck, 'value'])
+    
+    if(cur_dealer_sum - cur_player_sum > max_card_in_deck){
+      return("0% for this state, but still a chance later")
+    } 
+    else{
+      return(paste(round(100 * sum(deck_cards$value %in% 
+                         c((cur_dealer_sum - cur_player_sum): (21-cur_player_sum)))
+             / nrow(deck_cards)), '%'))
+    }
+  }
+}
+
+print_state <- function(dealer_hand, player_hand, deck, deck_descr){
+  print('Dealers hand:')
+  for(i in dealer_hand){
+      print(as.character(deck_descr[i, ]))
+  }
+  print(paste('Sum:', sum(deck_descr[dealer_hand, 'value'])))
+  print('')
+  print('Your hand:')
+  for(i in player_hand){
+      print(as.character(deck_descr[i, ]))
+  }
+  print(paste('Sum:', sum(deck_descr[player_hand, 'value'])))
+  print(paste("Chance:", calc_chance(dealer_hand, player_hand, deck, deck_descr)))
+}
+
+start_game <- function(deck_descr){
+  deck <- shuffle_deck()
+  
+  dealers_init <- sample(deck, 2)
+  deck <- deck[-match(dealers_init, deck)]
+  
+  player_init <- sample(deck, 2)
+  deck <- deck[-match(player_init, deck)]
+  print_state(dealers_init, player_init, deck, deck_descr)
+  
+  return(list('deck'=deck, 'player_hand'=player_init, 'dealer_hand'=dealers_init))
+}
+
+deal <- function(dealers_hand, player_hand, deck, deck_descr){
+  player_new_card <- sample(deck, 1)
+  deck <- deck[-match(player_new_card, deck)]
+  new_player_hand <- c(player_hand, player_new_card)
+  print_state(dealers_hand, new_player_hand, deck, deck_descr)
+  return(list('deck'=deck, 'player_hand'=new_player_hand))
+}
+
+stop_game <- function(dealer_hand, player_hand, deck, deck_descr){
+  player_cards = deck_descr[player_hand, ]
+  dealer_cards = deck_descr[dealer_hand, ]
+  deck_cards = deck_descr[deck, ]
+  
+  cur_player_sum <- sum(player_cards$value) 
+  cur_dealer_sum <- sum(dealer_cards$value)
+  
+  if((cur_player_sum > 21) | (cur_player_sum < cur_dealer_sum)){
+    print("Loss")
+  } 
+  else{
+    print("Victory")
+  } 
+}
+```
+
+
+### Lets keep our casino 4 decks as a vector of integers (ids from initial .csv file)
+# 1
+```{r, results = 'hold'}
+state <- start_game(deck_descr)
+deck <- state$deck
+player_hand <- state$player_hand
+dealers_hand <- state$dealer_hand
+
+state <- deal(dealers_hand, player_hand, deck, deck_descr)
+deck <- state$deck
+player_hand <- state$player_hand
+
+stop_game(dealers_hand, player_hand, deck, deck_descr)
+```
+# 2
+```{r, results = 'hold'}
+state <- start_game(deck_descr)
+deck <- state$deck
+player_hand <- state$player_hand
+dealers_hand <- state$dealer_hand
+
+state <- deal(dealers_hand, player_hand, deck, deck_descr)
+deck <- state$deck
+player_hand <- state$player_hand
+
+stop_game(dealers_hand, player_hand, deck, deck_descr)
+```
+
+# 3
+```{r, results = 'hold'}
+state <- start_game(deck_descr)
+deck <- state$deck
+player_hand <- state$player_hand
+dealers_hand <- state$dealer_hand
+
+state <- deal(dealers_hand, player_hand, deck, deck_descr)
+deck <- state$deck
+player_hand <- state$player_hand
+
+stop_game(dealers_hand, player_hand, deck, deck_descr)
+```
